@@ -11,19 +11,47 @@ import React, {
   View
 } from 'react-native';
 
+var Pusher = require('pusher-websocket-iso/react-native');
+
 class reactnativestarter extends Component {
+
+  constructor() {
+    super();
+    this.state ={
+      notifcations: [
+        {message: 'test'},
+        {message: 'test2'}
+      ],
+      pusher: 'a'
+    }
+  }
+
+  componentDidMount() {
+    const pusher = new Pusher('a72b893e775eb14e8b4c');
+    const channel = pusher.subscribe('test_channel');
+    channel.bind('my_event', (data) => {
+      this.setState({
+        notifcations: [
+          ...this.state.notifcations,
+          data
+        ]
+      });
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
+        <Text>
+          {this.state.pusher}
         </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Shake or press menu button for dev menu
-        </Text>
+        {
+          this.state.notifcations.map((notif, i) => (
+            <Text key={i}>
+              {notif.message}
+            </Text>
+          ))
+        }
       </View>
     );
   }
