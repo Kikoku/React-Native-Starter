@@ -19,53 +19,44 @@ class PusherTest extends Component {
   constructor() {
     super();
     this.state ={
-      notifcations: [
-        {message: 'test'},
-        {message: 'test2'}
-      ],
-      pusher: '2',
-      value: 20
-    }
+      messages: [{
+        user: 'Server', msg: 'Welcome to realtime'
+      }]
+    };
   }
 
   componentDidMount() {
     const pusher = new Pusher('a72b893e775eb14e8b4c');
-    const channel = pusher.subscribe('value_channel');
-    channel.bind('my_event', (data) => {
+    const channel = pusher.subscribe('messanger_channel');
+    channel.bind('post_message', (data) => {
       this.setState({
-        notifcations: [
-          ...this.state.notifcations,
+        messages: [
+          ...this.state.messages,
           data
         ]
       });
     });
-    channel.bind('value_update', (data) => {
-      this.setState({
-        value: this.state.value + data.value
-      });
-    });
+
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Text>
-          {this.state.pusher}
-        </Text>
-        <Text>
-          Value: {this.state.value}
-        </Text>
         {
-          this.state.notifcations.map((notif, i) => (
-            <Text key={i}>
-              {notif.message}
-            </Text>
+          this.state.messages.map((message, i) => (
+            <Message user={message.user} msg={message.msg} key={i}/>
           ))
         }
       </View>
     );
   }
 }
+
+const Message = ({user, msg}) => (
+  <Text>
+    {user} - {msg}
+  </Text>
+)
 
 const styles = StyleSheet.create({
   container: {
