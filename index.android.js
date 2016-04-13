@@ -22,19 +22,25 @@ class reactnativestarter extends Component {
         {message: 'test'},
         {message: 'test2'}
       ],
-      pusher: 'a'
+      pusher: '2',
+      value: 20
     }
   }
 
   componentDidMount() {
     const pusher = new Pusher('a72b893e775eb14e8b4c');
-    const channel = pusher.subscribe('test_channel');
+    const channel = pusher.subscribe('value_channel');
     channel.bind('my_event', (data) => {
       this.setState({
         notifcations: [
           ...this.state.notifcations,
           data
         ]
+      });
+    });
+    channel.bind('value_update', (data) => {
+      this.setState({
+        value: this.state.value + data.value
       });
     });
   }
@@ -44,6 +50,9 @@ class reactnativestarter extends Component {
       <View style={styles.container}>
         <Text>
           {this.state.pusher}
+        </Text>
+        <Text>
+          Value: {this.state.value}
         </Text>
         {
           this.state.notifcations.map((notif, i) => (
