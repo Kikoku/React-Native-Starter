@@ -8,7 +8,9 @@ import React, {
   Component,
   StyleSheet,
   Text,
-  View
+  View,
+  TextInput,
+  ScrollView
 } from 'react-native';
 
 
@@ -23,6 +25,18 @@ class PusherTest extends Component {
         user: 'Server', msg: 'Welcome to realtime'
       }]
     };
+    this.pushMsg = this.pushMsg.bind(this);
+
+  }
+
+  pushMsg(message) {
+    fetch('https://murmuring-beyond-44790.herokuapp.com/message', {
+      method:'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+    body: JSON.stringify(message)})
   }
 
   componentDidMount() {
@@ -42,13 +56,61 @@ class PusherTest extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {
-          this.state.messages.map((message, i) => (
-            <Message user={message.user} msg={message.msg} key={i}/>
-          ))
-        }
+        <MessageForm messageSubmit={this.pushMsg}/>
+        <ScrollView style={{height: 100}}>
+          {
+            this.state.messages.map((message, i) => (
+              <Message user={message.user} msg={message.msg} key={i}/>
+            ))
+          }
+        </ScrollView>
       </View>
     );
+  }
+}
+
+class MessageForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: '',
+      msg: ''
+    }
+    this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  onSubmit() {
+    const {user, msg} = this.state;
+
+    if(user != '' && msg != '') {
+      this.props.messageSubmit(this.state)
+      this.setState({
+        user: '',
+        msg: ''
+      })
+    }
+  }
+
+  render(){
+    return(
+      <View>
+        <TextInput
+          name="user"
+          placeholder="name"
+          value={this.state.user}
+          onChangeText={(user) => this.setState({user})}
+          keyobardType="default"
+          onSubmitEditing={this.onSubmit}
+        />
+        <TextInput
+          name="msg"
+          placeholder="msg"
+          value={this.state.msg}
+          onChangeText={(msg) => this.setState({msg})}
+          onSubmitEditing={this.onSubmit}
+        />
+      </View>
+    )
   }
 }
 
